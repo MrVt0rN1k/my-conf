@@ -1,0 +1,133 @@
+# .spaceshiprc.zsh
+
+# Определение порядка секций
+SPACESHIP_PROMPT_ORDER=(
+  time          # Время
+  user          # Пользователь
+  dir           # Текущая директория
+  host          # Хост
+  git           # Git информация
+  package       # Версия пакета
+  node          # Node.js
+  ruby          # Ruby
+  python        # Python
+  golang        # Go
+  php           # PHP
+  rust          # Rust
+  docker        # Docker
+  aws           # Amazon Web Services
+  kubectl       # Kubernetes
+  exec_time     # Время выполнения
+  line_sep      # Разделитель строк
+  battery       # Уровень батареи
+  jobs          # Фоновые задачи
+  exit_code     # Код выхода
+  char          # Символ промпта
+)
+
+# Основные настройки
+SPACESHIP_PROMPT_ASYNC=true
+SPACESHIP_PROMPT_SEPARATE_LINE=true
+SPACESHIP_PROMPT_FIRST_PREFIX_SHOW=true
+SPACESHIP_PROMPT_PREFIXES_SHOW=true
+SPACESHIP_PROMPT_SUFFIXES_SHOW=true
+SPACESHIP_PROMPT_DEFAULT_PREFIX="via "
+SPACESHIP_PROMPT_DEFAULT_SUFFIX=" "
+
+# Настройка символов
+SPACESHIP_CHAR_SYMBOL="➜"
+SPACESHIP_CHAR_SUFFIX=" "
+SPACESHIP_GIT_SYMBOL=""
+SPACESHIP_PACKAGE_SYMBOL="📦"
+SPACESHIP_NODE_SYMBOL="⬢"
+SPACESHIP_RUBY_SYMBOL="💎"
+SPACESHIP_PYTHON_SYMBOL="🐍 "
+SPACESHIP_GOLANG_SYMBOL="🐹"
+SPACESHIP_PHP_SYMBOL="🐘"
+SPACESHIP_RUST_SYMBOL="🦀"
+SPACESHIP_DOCKER_SYMBOL="🐳"
+SPACESHIP_AWS_SYMBOL="☁️"
+SPACESHIP_KUBECTL_SYMBOL="☸️"
+
+# Настройка цветов
+SPACESHIP_USER_COLOR="cyan"
+SPACESHIP_DIR_COLOR="blue"
+SPACESHIP_GIT_BRANCH_COLOR="green"
+SPACESHIP_GIT_STATUS_COLOR="red"
+SPACESHIP_PACKAGE_COLOR="yellow"
+SPACESHIP_NODE_COLOR="green"
+SPACESHIP_RUBY_COLOR="red"
+SPACESHIP_PYTHON_COLOR="yellow"
+SPACESHIP_GOLANG_COLOR="cyan"
+SPACESHIP_PHP_COLOR="purple"
+SPACESHIP_RUST_COLOR="red"
+SPACESHIP_DOCKER_COLOR="cyan"
+SPACESHIP_AWS_COLOR="208"
+SPACESHIP_KUBECTL_COLOR="blue"
+SPACESHIP_EXEC_TIME_COLOR="gray"
+SPACESHIP_BATTERY_COLOR="yellow"
+SPACESHIP_JOBS_COLOR="blue"
+SPACESHIP_EXIT_CODE_COLOR="red"
+SPACESHIP_CHAR_COLOR_SUCCESS="green"
+SPACESHIP_CHAR_COLOR_FAILURE="red"
+
+# Настройка времени
+SPACESHIP_TIME_SHOW=true
+SPACESHIP_TIME_PREFIX="at "
+SPACESHIP_TIME_COLOR="yellow"
+SPACESHIP_TIME_FORMAT="%D{%H:%M:%S}"
+
+# Настройка директории
+SPACESHIP_DIR_TRUNC=3
+SPACESHIP_DIR_TRUNC_REPO=false
+
+# Настройка Git
+SPACESHIP_GIT_SHOW=true
+SPACESHIP_GIT_PREFIX="on "
+SPACESHIP_GIT_SUFFIX=""
+SPACESHIP_GIT_BRANCH_SHOW=true
+SPACESHIP_GIT_STATUS_SHOW=true
+
+# Настройка Node.js
+SPACESHIP_NODE_SHOW=true
+SPACESHIP_NODE_PREFIX="$SPACESHIP_PROMPT_DEFAULT_PREFIX"
+SPACESHIP_NODE_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"
+SPACESHIP_NODE_DEFAULT_VERSION=""
+
+# Настройка Ruby
+SPACESHIP_RUBY_SHOW=true
+SPACESHIP_RUBY_PREFIX="$SPACESHIP_PROMPT_DEFAULT_PREFIX"
+SPACESHIP_RUBY_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"
+
+# Настройка Python
+SPACESHIP_PYTHON_SHOW=true
+SPACESHIP_PYTHON_PREFIX="$SPACESHIP_PROMPT_DEFAULT_PREFIX"
+SPACESHIP_PYTHON_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"
+
+# Настройка Go
+SPACESHIP_GOLANG_SHOW=true
+SPACESHIP_GOLANG_PREFIX="$SPACESHIP_PROMPT_DEFAULT_PREFIX"
+SPACESHIP_GOLANG_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"
+
+# Настройка PHP
+SPACESHIP_PHP_SHOW=true
+SPACESHIP_PHP_PREFIX="$SPACESHIP_PROMPT_DEFAULT_PREFIX"
+SPACESHIP_PHP_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"
+
+# Настройка Rust
+SPACESHIP_RUST_SHOW=true
+SPACESHIP_RUST_PREFIX="$SPACESHIP_PROMPT_DEFAULT_PREFIX"
+SPACESHIP_RUST_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"
+
+# Настройка времени выполнения
+SPACESHIP_EXEC_TIME_SHOW=true
+SPACESHIP_EXEC_TIME_PREFIX="took "
+SPACESHIP_EXEC_TIME_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"
+
+# Настройка батареи
+SPACESHIP_BATTERY_SHOW=true
+SPACESHIP_BATTERY_PREFIX=""
+SPACESHIP_BATTERY_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"
+SPACESHIP_BATTERY_SYMBOL_CHARGING="⚡️"
+SPACESHIP_BATTERY_SYMBOL_DISCHARGING="🔋"
+SPACESHIP_BATTERY_SYMBOL_FULL="🔌"
