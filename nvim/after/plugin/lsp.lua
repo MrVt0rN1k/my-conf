@@ -15,11 +15,16 @@ local on_attach = function(client, bufnr)
   vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 end
 
-lspconfig.tsserver.setup({
-  on_attach = on_attach,
+lspconfig.ts_ls.setup({
+ on_attach = on_attach,
 })
 
 -- Или, если ты работаешь с Python:
 lspconfig.pyright.setup({
   on_attach = on_attach,
 })
+
+lspconfig.gopls.setup({
+  on_attach = on_attach,
+})
+
