@@ -16,7 +16,7 @@ POWERLEVEL9K_MODE='nerdfont-complete'
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME="spaceship"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -140,7 +140,10 @@ alias gpo="git push origin"
 alias got="git push --tag origin"
 alias nomad-pack="nomad-pack render --parser-v1"
 alias git-clean="git branch  | grep -v '*' | grep -v 'develop' | xargs git branch -D  && git reset --hard && git clean -d -x -f"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Не загружать, если уже загружено
+if [[ -z "$SPACESHIP_CONFIG_LOADED" ]]; then
+  export SPACESHIP_CONFIG_LOADED=1
+  source ~/.spaceshiprc.zsh
+fi
+
