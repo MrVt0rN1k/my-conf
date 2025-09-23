@@ -1,4 +1,3 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -10,14 +9,30 @@ fi
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-POWERLEVEL9K_MODE='nerdfont-complete'
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="spaceship"
+add-ubu(){
+	 eval "$(ssh-agent)"
+	 ssh-add -s /usr/local/lib/opensc-pkcs11.so
 
+ }
+eval "$(ssh-agent -s)"
+if ! ssh-add -L | grep -q "PKCS#11"; then
+  ~/.ssh/add-ubu-auto.sh
+fi
+
+PRELINE="\r\033[A"
+
+function color { 
+    echo -e "\033]6;1;bg;red;brightness;$((1 + $RANDOM % 255))\a"$PRELINE
+    echo -e "\033]6;1;bg;green;brightness;$((1 + $RANDOM % 255))\a"$PRELINE
+    echo -e "\033]6;1;bg;blue;brightness;$((1 + $RANDOM % 255))\a"$PRELINE  
+}
+color
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
@@ -49,13 +64,11 @@ ZSH_THEME="spaceship"
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # You can also set it to another string to have that shown instead of the default red dots.
 # e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
 # Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -78,7 +91,7 @@ ZSH_THEME="spaceship"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-bat web-search)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -110,26 +123,15 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-PRELINE="\r\033[A"
-
-function color {
-    echo -e "\033]6;1;bg;red;brightness;$((1 + $RANDOM % 255))\a"$PRELINE
-    echo -e "\033]6;1;bg;green;brightness;$((1 + $RANDOM % 255))\a"$PRELINE
-    echo -e "\033]6;1;bg;blue;brightness;$((1 + $RANDOM % 255))\a"$PRELINE
-}
-color
-
+alias df="duf"
 alias man="tldr"
 alias top="btop"
 alias du="ncdu"
-alias find="fd"
+alias findd="fd"
 alias cat="bat"
-alias ping="gping"
+alias pingg="gping"
 alias nano="micro"
-alias ls="eza"
 alias c="clear"
-alias vim="nvim"
 alias gl="git pull"
 alias gt="git tag --sort=-creatordate | head -n 1"
 alias gp="git push"
@@ -140,10 +142,20 @@ alias gpo="git push origin"
 alias got="git push --tag origin"
 alias nomad-pack="nomad-pack render --parser-v1"
 alias git-clean="git branch  | grep -v '*' | grep -v 'develop' | xargs git branch -D  && git reset --hard && git clean -d -x -f"
-
-# Не загружать, если уже загружено
+alias pip="python3 -m pip"
+alias ls="eza"
+alias py="source ~/.pyenv/versions/3.10.13/envs/myenv/bin/activate"
+alias dd="deactivate"
+alias ansible-playbook="~/.pyenv/versions/3.10.13/envs/myenv/bin/ansible-playbook"
+alias vim="nvim"
+alias vi="nvim"
+export PATH="$PATH:/Users/nikolajtofilo/.local/bin"
 if [[ -z "$SPACESHIP_CONFIG_LOADED" ]]; then
   export SPACESHIP_CONFIG_LOADED=1
   source ~/.spaceshiprc.zsh
 fi
-
+bindkey "^[[1;3C" forward-word
+bindkey "^[[1;3D" backward-word
+export NVM_DIR="$HOME/.nvm"
+  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion

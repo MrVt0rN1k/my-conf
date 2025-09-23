@@ -1,0 +1,20 @@
+:q    HostName 65.21.47.96
+    User nikolay
+
+Host github-mrvt0rnik
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_new
+Host gitlab.com
+  HostName gitlab.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_nn
+  IdentitiesOnly yes
+Host github-NikolaiT-now
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_ed25519-github
+Host *
+	User nikolay
+	Preferredauthentications publickey
+	PKCS11Provider /usr/local/lib/opensc-pkcs11.so
