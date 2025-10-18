@@ -15,6 +15,14 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="spaceship"
+add-ubu(){
+	 eval "$(ssh-agent)"
+	 ssh-add -s /usr/local/lib/opensc-pkcs11.so
+ }
+eval "$(ssh-agent -s)"
+if ! ssh-add -L | grep -q "PKCS#11"; then
+  ~/.ssh/add-ubu-auto.sh
+fi
 
 PRELINE="\r\033[A"
 
