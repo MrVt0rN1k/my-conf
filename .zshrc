@@ -150,3 +150,11 @@ bindkey "^[[1;3D" backward-word
 export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+sshpass() {
+  if [ -z "$1" ]; then
+    echo "Usage: sshpass <ip> [extra-ssh-args]"
+    return 1
+  fi
+  ip="$1"; shift
+  ssh root@"$ip" -o PubkeyAuthentication=no -o PreferredAuthentications=password "$@"
+}
