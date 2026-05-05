@@ -65,13 +65,66 @@ brew install "${COMMON_PACKAGES[@]}" || true
 brew install openssl readline sqlite3 xz zlib tcl-tk
 else
 if command -v apt &> /dev/null; then
-install_package "${COMMON_PACKAGES[@]}" 
-build-essential make libssl-dev zlib1g-dev libbz2-dev 
-libreadline-dev libsqlite3-dev curl llvm libncursesw5-dev 
-xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+install_package "${COMMON_PACKAGES[@]}"
+install_package build-essential make libssl-dev zlib1g-dev libbz2-dev
+install_package libreadline-dev libsqlite3-dev curl llvm libncursesw5-dev
+install_package xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 else
 install_package "${COMMON_PACKAGES[@]}"
 fi
+fi
+
+# ====================== Node.js (нужен для LSP серверов) ======================
+
+if ! command -v node &> /dev/null; then
+echo -e "${YELLOW}Устанавливаю Node.js...${NC}"
+if [[ "$OS" == "macos" ]]; then
+brew install node
+else
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+install_package nodejs
+fi
+fi
+
+# ====================== LazyGit ======================
+
+if ! command -v lazygit &> /dev/null; then
+echo -e "${YELLOW}Устанавливаю LazyGit...${NC}"
+if [[ "$OS" == "macos" ]]; then
+brew install lazygit
+else
+LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+tar xf lazygit.tar.gz lazygit
+sudo install lazygit /usr/local/bin
+rm lazygit lazygit.tar.gz
+fi
+echo -e "${GREEN}✓ LazyGit установлен${NC}"
+fi
+
+# ====================== LSP серверы через npm ======================
+
+echo -e "${BLUE}Устанавливаю LSP серверы...${NC}"
+
+sudo npm install -g \
+pyright \
+typescript-language-server \
+yaml-language-server \
+bash-language-server \
+@docker/dockerfile-language-server-nodejs \
+markdownlint-cli 2>/dev/null || true
+
+# ====================== Линтеры через pip ======================
+
+echo -e "${BLUE}Устанавливаю линтеры...${NC}"
+pip install --user pylint yamllint sqlfluff black 2>/dev/null || true
+
+# ====================== Системные линтеры и форматтеры ======================
+
+if [[ "$OS" == "macos" ]]; then
+brew install shellcheck hadolint tflint shfmt
+else
+install_package shellcheck hadolint tflint shfmt 2>/dev/null || true
 fi
 
 # ====================== Oh My Zsh ======================
@@ -108,18 +161,20 @@ done
 
 # ====================== pyenv ======================
 
-if ! command -v pyenv &> /dev/null; then
-echo -e "${YELLOW}Устанавливаю pyenv...${NC}"
-curl -fsSL https://pyenv.run | bash
+# Проверяем, установлен ли pyenv
+if [[ -d "$HOME/.pyenv" ]]; then
+    echo -e "${GREEN}✓ pyenv уже установлен${NC}"
+else
+    echo -e "${YELLOW}Устанавливаю pyenv...${NC}"
+    curl -fsSL https://pyenv.run | bash
 fi
 
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 
-# ====================== pyenv init ======================
-
+# Добавляем pyenv init в .zshrc, если ещё не добавлено
 if ! grep -q 'pyenv init' "$HOME/.zshrc"; then
-cat << 'EOF' >> "$HOME/.zshrc"
+    cat << 'EOF' >> "$HOME/.zshrc"
 
 # >>> pyenv >>>
 
@@ -131,14 +186,14 @@ eval "$(pyenv virtualenv-init -)"
 # <<< pyenv <<<
 
 EOF
+    echo -e "${GREEN}✓ pyenv добавлен в .zshrc${NC}"
 fi
 
-# ====================== pyenv-virtualenv ======================
+# ====================== pyenv-virtualenv (исправлено) ======================
 
 if [[ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ]]; then
 echo -e "${YELLOW}Устанавливаю pyenv-virtualenv...${NC}"
-git clone https://github.com/pyenv/pyenv-virtualenv.git 
-"$HOME/.pyenv/plugins/pyenv-virtualenv"
+git clone https://github.com/pyenv/pyenv-virtualenv.git "$HOME/.pyenv/plugins/pyenv-virtualenv"
 fi
 
 # ====================== Python ======================
@@ -161,9 +216,52 @@ if ! pyenv virtualenvs --bare | grep -q "default"; then
 pyenv virtualenv "$PYTHON_VERSION" default
 fi
 
+# ====================== Проверка инструментов для Telescope ======================
+
+echo -e "${BLUE}Проверяю инструменты для Telescope...${NC}"
+
+if command -v fd &> /dev/null; then
+echo -e "${GREEN}✓ fd установлен${NC}"
+else
+echo -e "${YELLOW}⚠️ fd не найден (нужен для Telescope find_files)${NC}"
+fi
+
+if command -v rg &> /dev/null; then
+echo -e "${GREEN}✓ ripgrep установлен${NC}"
+else
+echo -e "${YELLOW}⚠️ ripgrep не найден (нужен для Telescope live_grep)${NC}"
+fi
+
+# ====================== Neovim конфиг ======================
+
+echo -e "${BLUE}Настраиваю Neovim конфигурацию...${NC}"
+
+NVIM_CONFIG_DIR="$HOME/.config/nvim"
+
+if [[ -d "$NVIM_CONFIG_DIR" ]]; then
+echo -e "${YELLOW}Бэкап существующего Neovim конфига...${NC}"
+mv "$NVIM_CONFIG_DIR" "$NVIM_CONFIG_DIR.bak.$(date +%Y%m%d_%H%M%S)"
+fi
+
+# Создаём структуру папок
+mkdir -p "$NVIM_CONFIG_DIR/lua/theprimagen"
+mkdir -p "$NVIM_CONFIG_DIR/after/plugin"
+mkdir -p "$NVIM_CONFIG_DIR/plugin"
+
+echo -e "${GREEN}✓ Структура Neovim конфига создана${NC}"
+echo -e "${YELLOW}⚠️ Не забудьте скопировать ваши .lua файлы в ~/.config/nvim/${NC}"
+
+# ====================== Финальное сообщение ======================
+
 echo -e "\n${GREEN}✅ Готово!${NC}"
 echo -e "${YELLOW}Теперь доступно:${NC}"
 echo -e "  py     → выбрать окружение"
 echo -e "  pynew  → создать окружение"
-echo -e "\nПерезапусти терминал или выполни: source ~/.zshrc"
-
+echo -e "  lazygit → открыть Git интерфейс"
+echo -e ""
+echo -e "${YELLOW}Для завершения настройки Neovim:${NC}"
+echo -e "  1. Скопируйте ваши .lua файлы в ~/.config/nvim/"
+echo -e "  2. Запустите nvim и выполните :Lazy sync"
+echo -e "  3. Перезапустите nvim"
+echo -e ""
+echo -e "${YELLOW}Перезапусти терминал или выполни: source ~/.zshrc${NC}"

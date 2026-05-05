@@ -201,3 +201,16 @@ function py() {
     fi
   done
 }
+
+# Created by `pipx` on 2026-05-05 16:42:34
+export PATH="$PATH:/Users/mrvt0rn1k/.local/bin"
+
+# >>> pyenv >>>
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+# <<< pyenv <<<
+
