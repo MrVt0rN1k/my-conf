@@ -234,23 +234,23 @@ fi
 
 # ====================== Neovim конфиг ======================
 
-echo -e "${BLUE}Настраиваю Neovim конфигурацию...${NC}"
+#echo -e "${BLUE}Настраиваю Neovim конфигурацию...${NC}"
 
-NVIM_CONFIG_DIR="$HOME/.config/nvim"
+#NVIM_CONFIG_DIR="$HOME/.config/nvim"
 
-if [[ -d "$NVIM_CONFIG_DIR" ]]; then
-echo -e "${YELLOW}Бэкап существующего Neovim конфига...${NC}"
-mv "$NVIM_CONFIG_DIR" "$NVIM_CONFIG_DIR.bak.$(date +%Y%m%d_%H%M%S)"
-fi
-
-# Создаём структуру папок
-mkdir -p "$NVIM_CONFIG_DIR/lua/theprimagen"
-mkdir -p "$NVIM_CONFIG_DIR/after/plugin"
-mkdir -p "$NVIM_CONFIG_DIR/plugin"
-
-echo -e "${GREEN}✓ Структура Neovim конфига создана${NC}"
-echo -e "${YELLOW}⚠️ Не забудьте скопировать ваши .lua файлы в ~/.config/nvim/${NC}"
-
+#if [[ -d "$NVIM_CONFIG_DIR" ]]; then
+#echo -e "${YELLOW}Бэкап существующего Neovim конфига...${NC}"
+#mv "$NVIM_CONFIG_DIR" "$NVIM_CONFIG_DIR.bak.$(date +%Y%m%d_%H%M%S)"
+#fi
+#
+## Создаём структуру папок
+#mkdir -p "$NVIM_CONFIG_DIR/lua/theprimagen"
+#mkdir -p "$NVIM_CONFIG_DIR/after/plugin"
+#mkdir -p "$NVIM_CONFIG_DIR/plugin"
+#
+#echo -e "${GREEN}✓ Структура Neovim конфига создана${NC}"
+#echo -e "${YELLOW}⚠️ Не забудьте скопировать ваши .lua файлы в ~/.config/nvim/${NC}"
+#
 # ====================== Финальное сообщение ======================
 
 echo -e "\n${GREEN}✅ Готово!${NC}"
