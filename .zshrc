@@ -135,7 +135,6 @@ alias nomad-pack="nomad-pack render --parser-v1"
 alias git-clean="git branch  | grep -v '*' | grep -v 'develop' | xargs git branch -D  && git reset --hard && git clean -d -x -f"
 alias pip="python3 -m pip"
 alias ls="eza"
-alias py="source ~/.pyenv/versions/3.10.13/envs/myenv/bin/activate"
 alias dd="deactivate"
 alias ansible-playbook="~/.pyenv/versions/3.10.13/envs/myenv/bin/ansible-playbook"
 alias vim="nvim"
@@ -157,4 +156,48 @@ sshpass() {
   fi
   ip="$1"; shift
   ssh root@"$ip" -o PubkeyAuthentication=no -o PreferredAuthentications=password "$@"
+}
+function pynew() {
+  local name
+  read "name?Имя окружения: "
+
+  if [[ -z "$name" ]]; then
+    echo "Имя не указано"
+    return 1
+  fi
+
+  echo "Выбери версию Python:"
+  local versions=($(pyenv versions --bare))
+
+  select ver in "${versions[@]}"; do
+    if [[ -n "$ver" ]]; then
+      echo "Создаю $name на Python $ver..."
+      pyenv virtualenv "$ver" "$name"
+      pyenv activate "$name"
+      echo "✅ Активировано: $name"
+      break
+    else
+      echo "Неверный выбор"
+    fi
+  done
+}
+function py() {
+  local envs
+  envs=($(pyenv virtualenvs --bare))
+
+  if [ ${#envs[@]} -eq 0 ]; then
+    echo "Нет доступных виртуальных окружений"
+    return 1
+  fi
+
+  echo "Выбери виртуальное окружение:"
+  select env in "${envs[@]}"; do
+    if [[ -n "$env" ]]; then
+      pyenv activate "$env"
+      echo "Активировано: $env"
+      break
+    else
+      echo "Неверный выбор"
+    fi
+  done
 }
