@@ -1,5 +1,3 @@
-print("cursor_color.lua loaded")
-print("TERM_PROGRAM:", vim.env.TERM_PROGRAM)
 -- =========================
 -- ЦВЕТА КУРСОРА ДЛЯ NEOVIM (iTerm2)
 -- =========================
