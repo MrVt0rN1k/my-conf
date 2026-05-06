@@ -134,6 +134,7 @@ alias c="clear"
 alias gl="git pull"
 alias gt="git tag --sort=-creatordate | head -n 1"
 alias gp="git push"
+alias gs="git status"
 alias gpt="git push && git push --tag"
 alias gc="git clone"
 alias gco="git checkout"
@@ -141,9 +142,8 @@ alias gpo="git push origin"
 alias got="git push --tag origin"
 alias nomad-pack="nomad-pack render --parser-v1"
 alias git-clean="git branch  | grep -v '*' | grep -v 'develop' | xargs git branch -D  && git reset --hard && git clean -d -x -f"
-alias pip="python3 -m pip"
+alias pip="pipx"
 alias ls="eza"
-alias py="source ~/.pyenv/versions/3.10.13/envs/myenv/bin/activate"
 alias dd="deactivate"
 alias ansible-playbook="~/.pyenv/versions/3.10.13/envs/myenv/bin/ansible-playbook"
 alias vim="nvim"
@@ -158,3 +158,68 @@ bindkey "^[[1;3D" backward-word
 export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+sshpass() {
+  if [ -z "$1" ]; then
+    echo "Usage: sshpass <ip> [extra-ssh-args]"
+    return 1
+  fi
+  ip="$1"; shift
+  ssh root@"$ip" -o PubkeyAuthentication=no -o PreferredAuthentications=password "$@"
+}
+function pynew() {
+  local name
+  read "name?Имя окружения: "
+
+  if [[ -z "$name" ]]; then
+    echo "Имя не указано"
+    return 1
+  fi
+
+  echo "Выбери версию Python:"
+  local versions=($(pyenv versions --bare))
+
+  select ver in "${versions[@]}"; do
+    if [[ -n "$ver" ]]; then
+      echo "Создаю $name на Python $ver..."
+      pyenv virtualenv "$ver" "$name"
+      pyenv activate "$name"
+      echo "✅ Активировано: $name"
+      break
+    else
+      echo "Неверный выбор"
+    fi
+  done
+}
+function py() {
+  local envs
+  envs=($(pyenv virtualenvs --bare))
+
+  if [ ${#envs[@]} -eq 0 ]; then
+    echo "Нет доступных виртуальных окружений"
+    return 1
+  fi
+
+  echo "Выбери виртуальное окружение:"
+  select env in "${envs[@]}"; do
+    if [[ -n "$env" ]]; then
+      pyenv activate "$env"
+      echo "Активировано: $env"
+      break
+    else
+      echo "Неверный выбор"
+    fi
+  done
+}
+
+# Created by `pipx` on 2026-05-05 16:42:34
+export PATH="$PATH:/Users/mrvt0rn1k/.local/bin"
+
+# >>> pyenv >>>
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+# <<< pyenv <<<
+

@@ -1,12 +1,15 @@
--- Подключение packer
-vim.cmd [[packadd packer.nvim]]
+-- Lazy.nvim (должен быть первым!)
+require("theprimagen.lazy")
 
--- Инициализация packer
-require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim'
-  -- сюда добавляй свои плагины
-end)
+-- Основные настройки
+require("theprimagen.set")
+require("theprimagen.remap")
 
-require("theprimagen")
-require("cursor").setup()
+-- Cursor settings
+require("cursor_color")
+require("cursor")
+vim.cmd("source ~/.vimrc")
 
+
+-- После-плагин файлы (если нужно)
+-- require("after.plugin.colors")
