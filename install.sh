@@ -62,7 +62,7 @@ zoxide fzf
 
 if [[ "$OS" == "macos" ]]; then
 brew install "${COMMON_PACKAGES[@]}" || true
-brew install openssl readline sqlite3 xz zlib tcl-tk
+brew install pipx openssl readline sqlite3 xz zlib tcl-tk
 else
 if command -v apt &> /dev/null; then
 install_package "${COMMON_PACKAGES[@]}"
