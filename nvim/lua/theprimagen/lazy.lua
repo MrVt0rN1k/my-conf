@@ -20,7 +20,40 @@ require("lazy").setup({
   {
     "nvim-telescope/telescope.nvim",
     tag = "0.1.8",
-    dependencies = { "nvim-lua/plenary.nvim" }
+    dependencies = { 
+      "nvim-lua/plenary.nvim",
+      "mrloop/telescope-git-branch.nvim",
+    },
+    config = function()
+      local telescope = require("telescope")
+      telescope.setup({
+        extensions = {
+          git_branch = {
+            mappings = {
+              i = {
+                ["<CR>"] = function(prompt_bufnr)
+                  local entry = require("telescope.actions.state").get_selected_entry()
+                  local branch_name = entry[1]
+                  vim.cmd("git checkout " .. branch_name)
+                  require("telescope.actions").close(prompt_bufnr)
+                end,
+              },
+            },
+          },
+        },
+        pickers = {
+          git_commits = {
+            theme = "dropdown",
+            layout_config = { height = 0.6 },
+          },
+          git_status = {
+            theme = "dropdown",
+            layout_config = { height = 0.8 },
+          },
+        },
+      })
+      telescope.load_extension("git_branch")
+    end
   },
 
   -- Тема
@@ -36,11 +69,29 @@ require("lazy").setup({
   "mbbill/undotree",
   "tpope/vim-fugitive",
 
+  -- Diffview.nvim
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Open Diffview" },
+      { "<leader>gD", "<cmd>DiffviewClose<cr>", desc = "Close Diffview" },
+    },
+    config = function()
+      require("diffview").setup({
+        view = {
+          merge_tool = {
+            layout = "diff3_horizontal",
+          },
+        },
+      })
+    end,
+  },
+
   -- =============================================
   -- LSP и автодополнение (Neovim 0.11+)
   -- =============================================
 
-  -- Менеджер LSP серверов
   {
     "williamboman/mason.nvim",
     build = ":MasonUpdate",
@@ -49,11 +100,9 @@ require("lazy").setup({
     end
   },
 
-  -- LSP конфиги (новый способ)
   {
     "neovim/nvim-lspconfig",
     config = function()
-      -- Используем новый vim.lsp.config API
       vim.lsp.config("yamlls", {
         cmd = { "yaml-language-server", "--stdio" },
         filetypes = { "yaml", "yml" },
@@ -114,7 +163,7 @@ require("lazy").setup({
         },
       })
 
-      vim.lsp.config("ts_ls", {  -- вместо deprecated tsserver
+      vim.lsp.config("ts_ls", {
         cmd = { "typescript-language-server", "--stdio" },
         filetypes = { "typescript", "javascript", "tsx", "jsx" },
         root_markers = { "tsconfig.json", "package.json", ".git" },
@@ -158,7 +207,6 @@ require("lazy").setup({
         },
       })
 
-      -- Базовые хоткеи для LSP
       local on_attach = function(client, bufnr)
         local opts = { buffer = bufnr }
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
@@ -172,7 +220,6 @@ require("lazy").setup({
         vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
       end
 
-      -- Активируем LSP серверы
       vim.lsp.enable("yamlls")
       vim.lsp.enable("gopls")
       vim.lsp.enable("pyright")
@@ -183,7 +230,6 @@ require("lazy").setup({
       vim.lsp.enable("sqlls")
       vim.lsp.enable("lua_ls")
 
-      -- Настройка автокоманд для on_attach (новый способ)
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           on_attach(nil, args.buf)
@@ -192,9 +238,6 @@ require("lazy").setup({
     end,
   },
 
-  -- =============================================
-  -- ДОБАВЛЕНО: Автозакрытие скобок
-  -- =============================================
   {
     "windwp/nvim-autopairs",
     event = "InsertEnter",
@@ -224,7 +267,6 @@ require("lazy").setup({
     end,
   },
 
-  -- Автодополнение (ОБНОВЛЕНО с интеграцией autopairs)
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
@@ -242,7 +284,6 @@ require("lazy").setup({
       local luasnip = require("luasnip")
       local lspkind = require("lspkind")
 
-      -- Интеграция с nvim-autopairs
       local cmp_autopairs = require("nvim-autopairs.completion.cmp")
       cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 
@@ -296,7 +337,6 @@ require("lazy").setup({
         },
       })
 
-      -- Автодополнение для командной строки
       cmp.setup.cmdline(":", {
         mapping = cmp.mapping.preset.cmdline(),
         sources = {
@@ -307,13 +347,11 @@ require("lazy").setup({
     end,
   },
 
-  -- Линтер
   {
     "mfussenegger/nvim-lint",
     config = function()
       local lint = require("lint")
 
-      -- DevOps линтеры
       lint.linters_by_ft = {
         yaml = { "yamllint" },
         typescript = { "eslint" },
@@ -329,7 +367,6 @@ require("lazy").setup({
         markdown = { "markdownlint" },
       }
 
-      -- Автоматический запуск линтера
       local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
       vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
         group = lint_augroup,
@@ -340,11 +377,7 @@ require("lazy").setup({
     end,
   },
 
-  -- =============================================
-  -- GIT ИНТЕГРАЦИЯ (ОБНОВЛЕНО с хоткеями)
-  -- =============================================
-  
-  -- Gitsigns - показывает изменения в файлах
+  -- GIT INTEGRATION
   {
     "lewis6991/gitsigns.nvim",
     config = function()
@@ -358,8 +391,7 @@ require("lazy").setup({
         },
         on_attach = function(bufnr)
           local gs = require("gitsigns")
-          
-          -- Хоткеи для работы с гитом в режиме редактирования
+
           vim.keymap.set('n', '<leader>hs', gs.stage_hunk, { buffer = bufnr, desc = 'Stage hunk' })
           vim.keymap.set('n', '<leader>hr', gs.reset_hunk, { buffer = bufnr, desc = 'Reset hunk' })
           vim.keymap.set('n', '<leader>hS', gs.stage_buffer, { buffer = bufnr, desc = 'Stage buffer' })
@@ -367,8 +399,6 @@ require("lazy").setup({
           vim.keymap.set('n', '<leader>hp', gs.preview_hunk, { buffer = bufnr, desc = 'Preview hunk' })
           vim.keymap.set('n', '<leader>hb', function() gs.blame_line({ full = true }) end, { buffer = bufnr, desc = 'Blame line' })
           vim.keymap.set('n', '<leader>hd', gs.diffthis, { buffer = bufnr, desc = 'Diff this' })
-          
-          -- Навигация по изменённым строкам
           vim.keymap.set('n', ']c', function() gs.next_hunk() end, { buffer = bufnr, desc = 'Next hunk' })
           vim.keymap.set('n', '[c', function() gs.prev_hunk() end, { buffer = bufnr, desc = 'Prev hunk' })
         end,
@@ -376,7 +406,6 @@ require("lazy").setup({
     end,
   },
 
-  -- LazyGit - TUI интерфейс для Git
   {
     "kdheepak/lazygit.nvim",
     cmd = "LazyGit",
@@ -386,9 +415,6 @@ require("lazy").setup({
     },
   },
 
-  -- =============================================
-  -- ДОБАВЛЕНО: Полезные сниппеты для DevOps
-  -- =============================================
   {
     "rafamadriz/friendly-snippets",
     dependencies = { "L3MON4D3/LuaSnip" },
@@ -397,3 +423,247 @@ require("lazy").setup({
     end,
   },
 })
+
+-- =============================================
+-- FULL GIT WORKFLOW KEYMAPS
+-- =============================================
+
+local function notify(msg, level)
+  level = level or "info"
+  vim.notify(msg, level, { title = "Git", timeout = 2000 })
+end
+
+-- Branches
+local function git_checkout_branch()
+  require('telescope').extensions.git_branch.branches({
+    attach_mappings = function(prompt_bufnr, map)
+      map('i', '<CR>', function()
+        local selection = require('telescope.actions.state').get_selected_entry()
+        if selection then
+          local branch = selection[1]
+          vim.cmd('Git checkout ' .. branch)
+          notify('Switched to branch: ' .. branch)
+        end
+        require('telescope.actions').close(prompt_bufnr)
+      end)
+      return true
+    end,
+  })
+end
+
+vim.keymap.set('n', '<leader>gco', git_checkout_branch, { desc = 'Git: Checkout branch' })
+vim.keymap.set('n', '<leader>gb', git_checkout_branch, { desc = 'Git: Switch branch' })
+vim.keymap.set('n', '<leader>gcb', function()
+  local branch = vim.fn.input('New branch name: ')
+  if branch ~= '' then
+    vim.cmd('Git checkout -b ' .. branch)
+    notify('Created branch: ' .. branch)
+  end
+end, { desc = 'Git: Create branch' })
+vim.keymap.set('n', '<leader>gdb', function()
+  local branch = vim.fn.input('Branch to delete: ')
+  if branch ~= '' then
+    vim.cmd('Git branch -d ' .. branch)
+    notify('Deleted branch: ' .. branch, "warn")
+  end
+end, { desc = 'Git: Delete branch' })
+
+-- Commits
+vim.keymap.set('n', '<leader>gc', function()
+  require('telescope.builtin').git_status({
+    attach_mappings = function(prompt_bufnr, map)
+      map('i', '<C-c>', function()
+        require('telescope.actions').close(prompt_bufnr)
+        local commit_msg = vim.fn.input('Commit message: ')
+        if commit_msg ~= '' then
+          vim.cmd('Git commit -m "' .. commit_msg .. '"')
+          notify('Committed: ' .. commit_msg)
+        end
+      end)
+      return true
+    end,
+  })
+end, { desc = 'Git: Commit' })
+
+vim.keymap.set('n', '<leader>gca', function()
+  local commit_msg = vim.fn.input('Commit message (all files): ')
+  if commit_msg ~= '' then
+    vim.cmd('Git add .')
+    vim.cmd('Git commit -m "' .. commit_msg .. '"')
+    notify('Committed all: ' .. commit_msg)
+  end
+end, { desc = 'Git: Commit all' })
+
+vim.keymap.set('n', '<leader>gcf', function()
+  local commit_msg = vim.fn.input('Commit message (current file): ')
+  if commit_msg ~= '' then
+    local file = vim.fn.expand('%:p')
+    vim.cmd('Git add ' .. file)
+    vim.cmd('Git commit -m "' .. commit_msg .. '"')
+    notify('Committed file: ' .. commit_msg)
+  end
+end, { desc = 'Git: Commit current file' })
+
+vim.keymap.set('n', '<leader>gcaa', function()
+  local amend_msg = vim.fn.input('Amend message (empty to keep): ')
+  if amend_msg == '' then
+    vim.cmd('Git commit --amend --no-edit')
+    notify('Amended commit')
+  else
+    vim.cmd('Git commit --amend -m "' .. amend_msg .. '"')
+    notify('Amended: ' .. amend_msg)
+  end
+end, { desc = 'Git: Amend commit' })
+
+vim.keymap.set('n', '<leader>gl', function()
+  require('telescope.builtin').git_commits()
+end, { desc = 'Git: Show commits' })
+vim.keymap.set('n', '<leader>gL', function()
+  require('telescope.builtin').git_bcommits()
+end, { desc = 'Git: File commits' })
+
+-- Merge & Rebase
+vim.keymap.set('n', '<leader>gm', function()
+  local branches = {}
+  local handle = io.popen('git branch --format="%(refname:short)"')
+  if handle then
+    for branch in handle:lines() do
+      table.insert(branches, branch)
+    end
+    handle:close()
+  end
+  vim.ui.select(branches, { prompt = 'Merge branch:' }, function(choice)
+    if choice then
+      vim.cmd('Git merge ' .. choice)
+      notify('Merged: ' .. choice)
+    end
+  end)
+end, { desc = 'Git: Merge' })
+
+vim.keymap.set('n', '<leader>grb', function()
+  local branches = {}
+  local handle = io.popen('git branch --format="%(refname:short)"')
+  if handle then
+    for branch in handle:lines() do
+      table.insert(branches, branch)
+    end
+    handle:close()
+  end
+  vim.ui.select(branches, { prompt = 'Rebase onto:' }, function(choice)
+    if choice then
+      vim.cmd('Git rebase ' .. choice)
+      notify('Rebasing onto: ' .. choice)
+    end
+  end)
+end, { desc = 'Git: Rebase' })
+
+vim.keymap.set('n', '<leader>grbc', '<cmd>Git rebase --continue<cr>', { desc = 'Git: Rebase continue' })
+vim.keymap.set('n', '<leader>grbs', '<cmd>Git rebase --skip<cr>', { desc = 'Git: Rebase skip' })
+vim.keymap.set('n', '<leader>grba', '<cmd>Git rebase --abort<cr>', { desc = 'Git: Rebase abort' })
+
+-- Stash
+vim.keymap.set('n', '<leader>gsa', '<cmd>Git stash push<cr>', { desc = 'Git: Stash' })
+vim.keymap.set('n', '<leader>gsn', function()
+  local name = vim.fn.input('Stash name: ')
+  if name ~= '' then
+    vim.cmd('Git stash push -m "' .. name .. '"')
+    notify('Stashed: ' .. name)
+  end
+end, { desc = 'Git: Stash with name' })
+vim.keymap.set('n', '<leader>gsp', '<cmd>Git stash pop<cr>', { desc = 'Git: Stash pop' })
+vim.keymap.set('n', '<leader>gsl', '<cmd>Git stash list<cr>', { desc = 'Git: Stash list' })
+vim.keymap.set('n', '<leader>gsd', '<cmd>Git stash drop<cr>', { desc = 'Git: Stash drop' })
+vim.keymap.set('n', '<leader>gss', '<cmd>Git stash show<cr>', { desc = 'Git: Stash show' })
+
+-- Push/Pull/Fetch
+vim.keymap.set('n', '<leader>gp', function()
+  vim.ui.select({ 'push', 'push --force-with-lease', 'push --force' }, {
+    prompt = 'Push options:',
+  }, function(choice)
+    if choice then
+      vim.cmd('Git ' .. choice)
+      notify(choice)
+    end
+  end)
+end, { desc = 'Git: Push' })
+vim.keymap.set('n', '<leader>gP', '<cmd>Git pull<cr>', { desc = 'Git: Pull' })
+vim.keymap.set('n', '<leader>gf', '<cmd>Git fetch<cr>', { desc = 'Git: Fetch' })
+vim.keymap.set('n', '<leader>gfa', '<cmd>Git fetch --all<cr>', { desc = 'Git: Fetch all' })
+
+-- Info
+vim.keymap.set('n', '<leader>gst', function()
+  require('telescope.builtin').git_status()
+end, { desc = 'Git: Status' })
+vim.keymap.set('n', '<leader>gbl', '<cmd>Git blame<cr>', { desc = 'Git: Blame' })
+vim.keymap.set('n', '<leader>gdf', '<cmd>Git diff<cr>', { desc = 'Git: Diff' })
+vim.keymap.set('n', '<leader>glg', '<cmd>Git log --graph --oneline --decorate<cr>', { desc = 'Git: Log graph' })
+
+-- Reset & Undo
+vim.keymap.set('n', '<leader>gu', function()
+  local file = vim.fn.expand('%:p')
+  vim.cmd('Git reset HEAD ' .. file)
+  notify('Unstaged: ' .. vim.fn.expand('%:t'))
+end, { desc = 'Git: Unstage' })
+vim.keymap.set('n', '<leader>gR', function()
+  local confirm = vim.fn.confirm('Reset current file?', "&Yes\n&No", 2)
+  if confirm == 1 then
+    local file = vim.fn.expand('%:p')
+    vim.cmd('Git checkout HEAD -- ' .. file)
+    notify('Reset file', "warn")
+  end
+end, { desc = 'Git: Reset file' })
+vim.keymap.set('n', '<leader>grs', '<cmd>Git reset --soft HEAD~1<cr>', { desc = 'Git: Soft reset' })
+vim.keymap.set('n', '<leader>grh', '<cmd>Git reset --hard HEAD~1<cr>', { desc = 'Git: Hard reset' })
+
+-- Help command
+vim.api.nvim_create_user_command('GitHelp', function()
+  local help_lines = {
+    "Git Hotkeys:",
+    "",
+    "Branches:",
+    "  <leader>gco/gb - Switch branch",
+    "  <leader>gcb    - Create branch",
+    "  <leader>gdb    - Delete branch",
+    "",
+    "Commits:",
+    "  <leader>gc     - Commit (select files)",
+    "  <leader>gca    - Commit all",
+    "  <leader>gcf    - Commit current file",
+    "  <leader>gcaa   - Amend commit",
+    "  <leader>gl     - Show commits",
+    "",
+    "Merge/Rebase:",
+    "  <leader>gm     - Merge branch",
+    "  <leader>grb    - Rebase",
+    "  <leader>grbc   - Rebase continue",
+    "  <leader>grba   - Rebase abort",
+    "",
+    "Stash:",
+    "  <leader>gsa    - Stash",
+    "  <leader>gsn    - Stash named",
+    "  <leader>gsp    - Stash pop",
+    "  <leader>gsl    - Stash list",
+    "",
+    "Push/Pull:",
+    "  <leader>gp     - Push (with options)",
+    "  <leader>gP     - Pull",
+    "  <leader>gf     - Fetch",
+    "",
+    "Other:",
+    "  <leader>gst    - Status",
+    "  <leader>gbl    - Blame",
+    "  <leader>gg     - LazyGit",
+    "  <leader>gd     - Diffview",
+    "  <leader>gu     - Unstage",
+    "  <leader>gR     - Reset file",
+    "",
+    "Gitsigns (hunks):",
+    "  <leader>hs     - Stage hunk",
+    "  <leader>hr     - Reset hunk",
+    "  ]c / [c        - Next/prev hunk",
+  }
+  vim.api.nvim_echo(vim.tbl_map(function(line)
+    return { line, "Normal" }
+  end, help_lines), true, {})
+end, {})
+
