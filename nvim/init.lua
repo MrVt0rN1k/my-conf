@@ -7,9 +7,8 @@ require("theprimagen.remap")
 
 -- Cursor settings
 require("cursor_color")
-require("cursor")
+--require("cursor")
 vim.cmd("source ~/.vimrc")
 
-
 -- После-плагин файлы (если нужно)
--- require("after.plugin.colors")
+require("plugin.colors")
